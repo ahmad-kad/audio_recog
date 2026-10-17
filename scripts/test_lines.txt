@@ -1,0 +1,32 @@
+# Say each line after the marker. The word on the left is the expected command.
+# CHAT means the line is not a rover command.
+
+FOLLOW | follow me
+FOLLOW | walk with me
+FOLLOW | stick with me
+FOLLOW | heel
+FOLLOW | by my side
+STAY | stay
+STAY | stop
+STAY | stop right there
+STAY | do not move
+STAY | stand still
+STAY | sit
+STAY | sit down
+FETCH | fetch the hammer
+FETCH | go grab the rock hammer
+FETCH | bring me the hammer
+COME | come here
+COME | over here
+COME | get over here
+COME | this way
+COME | here
+GIVE | give
+GIVE | put it down
+GIVE | let go
+GIVE | hand me the hammer
+CHAT | what time is it
+CHAT | let's go
+CHAT | leave it
+CHAT | get it
+CHAT | down

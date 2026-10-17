@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Build and upload firmware/xiao_mic_bridge to the XIAO ESP32S3.
+# Usage: scripts/flash_bridge [/dev/cu.usbmodemXXX | /dev/ttyACM0]
+set -euo pipefail
+cd "$(dirname "$0")/.."
+FQBN="esp32:esp32:XIAO_ESP32S3"
+shopt -s nullglob
+ports=(/dev/cu.usbmodem* /dev/ttyACM*)
+PORT="${1:-${ports[0]:-}}"
+if [[ -z "$PORT" ]]; then
+  echo "No XIAO found. Plug a data cable into the XIAO's own USB-C port." >&2
+  exit 1
+fi
+arduino-cli compile -b "$FQBN" firmware/xiao_mic_bridge
+if ! arduino-cli upload -b "$FQBN" -p "$PORT" firmware/xiao_mic_bridge; then
+  echo "Upload failed. Hold the XIAO's B button while plugging it in, then run this again." >&2
+  exit 1
+fi
+echo "Bridge flashed on $PORT. Check it with: scripts/run --check-array"

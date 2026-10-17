@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rover-voice"
+version = "0.1.0"
+description = "Offline rover voice commands on a Mac or a Linux ROS 2 computer"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=1.26",
+    "sounddevice>=0.5",
+    "pyserial>=3.5",
+    "mlx>=0.32; sys_platform == 'darwin'",
+    "mlx-whisper>=0.4; sys_platform == 'darwin'",
+    "mlx-lm>=0.32; sys_platform == 'darwin'",
+    "faster-whisper>=1.2; sys_platform == 'linux'",
+    "huggingface_hub>=0.26",
+    "sentence-transformers>=5.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "mypy>=1.18", "pyflakes>=3.4"]
+
+[project.scripts]
+rover-voice = "rover_voice.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "ros/rover_voice_ros", "."]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+files = ["src/rover_voice", "ros/rover_voice_ros/rover_voice_ros"]
+
+# The ML libraries are large and partly untyped; checking into them takes
+# minutes and finds nothing in this project's code.
+[[tool.mypy.overrides]]
+module = [
+    "mlx.*",
+    "mlx_whisper.*",
+    "mlx_lm.*",
+    "sentence_transformers.*",
+    "transformers.*",
+    "torch.*",
+    "huggingface_hub.*",
+    "sounddevice",
+    "serial.*",
+]
+follow_imports = "skip"
+follow_untyped_imports = false

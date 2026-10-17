@@ -1,0 +1,15 @@
+# Tested pins. Markers pick the Mac (MLX) or Linux (faster-whisper) stack.
+numpy==2.5.4; sys_platform == "darwin"
+# ROS 2 Jazzy's message packages are built against NumPy 1.x.
+numpy==1.26.4; sys_platform == "linux"
+sounddevice==0.5.6
+pyserial==3.5
+mlx==0.32.3; sys_platform == "darwin"
+mlx-whisper==0.4.3; sys_platform == "darwin"
+mlx-lm==0.32.0; sys_platform == "darwin"
+faster-whisper==1.2.1; sys_platform == "linux"
+huggingface_hub==1.33.0
+sentence-transformers==6.1.0
+pytest==9.1.1
+mypy==1.18.2
+pyflakes==3.4.0

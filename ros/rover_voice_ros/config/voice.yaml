@@ -1,0 +1,15 @@
+# Parameters for rover_voice_ros voice_node: params_file:=/path/voice.yaml
+# voice.launch.py also sets input, speak, use_llm, and frame_id from its
+# launch arguments, which win over this file.
+/**:  # only this node gets the file, also under a namespace
+  ros__parameters:
+    # xiao: reSpeaker Flex through the XIAO bridge. default: the system
+    # microphone. A /dev path or a microphone name also works. none: no
+    # microphone; text arrives on ~/text_in.
+    input: xiao
+    speak: true             # speak replies (espeak-ng on Linux)
+    use_llm: true           # answer other speech with the local chat model
+    frame_id: respeaker_link
+    asr_backend: ""         # "" picks faster-whisper on Linux, mlx on a Mac
+    asr_model: ""           # "" picks base.en
+    log_dir: ~/.ros/rover_voice   # transcript logs; "" to turn off
