@@ -96,11 +96,13 @@ def run_live(
     decoder = LiveDecoder(
         session, asr, segmenter, debug=debug, directions=microphone.directions
     )
+    audio_level = ""
     try:
         while not control.stopped:
             if not control.apply(session):
                 break
             frame = microphone.read(timeout=0.5)
+            audio_level = _report_audio(microphone, events, audio_level)
             if frame is None or not control.listening:
                 continue
             if not decoder.feed(frame):
@@ -111,6 +113,21 @@ def run_live(
         session.speaker.interrupt()
         microphone.close()
     return 0
+
+
+def _report_audio(microphone: Microphone, events: EventBus, previous: str) -> str:
+    """Say when the stream becomes silent, clipped, or dead. Return the level."""
+    health = getattr(microphone, "health", None)
+    if health is None:
+        return previous
+    report = health.report()
+    if report.level == previous:
+        return previous
+    if report.level != "ok":
+        events.emit(Status(report.message))
+    elif previous:
+        events.emit(Status("Audio ok."))
+    return report.level
 
 
 def run_headless(session: RoverSession, control: LoopControl) -> int:

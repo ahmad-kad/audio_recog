@@ -187,5 +187,5 @@ The unit tests need no microphone, models, hardware, or ROS. The bridge tests us
 | `src/rover_voice/doa_tools.py` | `--check-array`, `--doa`, `--doa-calibrate` |
 | `firmware/xiao_mic_bridge/` | XIAO ESP32S3 firmware |
 | `ros/` | ROS 2 packages: `rover_voice_msgs`, `rover_voice_ros` |
-| `docs/` | command phrases, reSpeaker hardware notes, ROS 2 |
+| `docs/` | [architecture](docs/architecture.md), [commands](docs/commands.md), [reSpeaker](docs/respeaker.md), [ROS 2](docs/ros2.md), [TODO](docs/TODO.md) |
 | `scripts/` | setup (Mac, Linux, ROS), tests, run, firmware flashing |

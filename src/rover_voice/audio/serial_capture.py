@@ -22,6 +22,7 @@ from rover_voice.audio.direction import (
     DirectionTracker,
     now,
 )
+from rover_voice.audio.health import AudioMonitor
 from rover_voice.config import FRAME_MS, SAMPLE_RATE
 from rover_voice.errors import AudioDeviceError
 
@@ -140,6 +141,7 @@ class SerialMicrophoneStream:
         self.sample_rate = sample_rate
         self.frame_samples = int(sample_rate * frame_ms / 1000)
         self.directions = DirectionTracker(Calibration.load())
+        self.health = AudioMonitor()
         self.reconnects = 0
         self._queue: queue.Queue[np.ndarray] = queue.Queue()
         self._serial_module = serial_module
@@ -170,9 +172,11 @@ class SerialMicrophoneStream:
 
     def read(self, timeout: float = 0.5) -> np.ndarray | None:
         try:
-            return self._queue.get(timeout=timeout)
+            frame = self._queue.get(timeout=timeout)
         except queue.Empty:
-            return None
+            frame = None
+        self.health.observe(frame)
+        return frame
 
     def drain(self) -> None:
         """Drop audio captured while the rover was speaking."""
@@ -265,6 +269,7 @@ class SerialMicrophoneStream:
                     if not stalled:
                         logger.warning("No audio from the reSpeaker. Asking it to stream again.")
                         stalled = True
+                        self.health.set_stalled(True)
                     self._serial.write(b"LS")
                     last_audio = time.monotonic()
             except OSError:
@@ -282,6 +287,7 @@ class SerialMicrophoneStream:
             if stalled:
                 logger.warning("reSpeaker audio is back.")
                 stalled = False
+                self.health.set_stalled(False)
             last_audio = time.monotonic()
             pending = np.concatenate([pending, *frames])
             while pending.size >= self.frame_samples:

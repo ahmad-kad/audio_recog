@@ -171,12 +171,18 @@ class VoiceNode(Node):
     def _publish_diagnostics(self) -> None:
         microphone = self._microphone
         directions = microphone.directions if microphone is not None else None
+        health = getattr(microphone, "health", None)
+        report = health.report() if health is not None else None
         level, message, values = mapping.diagnostic(
             self._input_name,
             self.control.listening,
             directions is not None and directions.calibration is not None,
             int(getattr(microphone, "reconnects", 0)),
             self._failed,
+            audio_level="ok" if report is None else report.level,
+            audio_message="Audio ok." if report is None else report.message,
+            audio_rms=0.0 if report is None else report.rms,
+            audio_peak=0.0 if report is None else report.peak,
         )
         status = DiagnosticStatus(
             level=_LEVELS[level],

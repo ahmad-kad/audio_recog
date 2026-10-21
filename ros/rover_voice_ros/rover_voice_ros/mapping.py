@@ -72,18 +72,34 @@ def diagnostic(
     calibrated: bool,
     reconnects: int,
     failed: str | None = None,
+    audio_level: str = "ok",
+    audio_message: str = "Audio ok.",
+    audio_rms: float = 0.0,
+    audio_peak: float = 0.0,
 ) -> tuple[str, str, list[tuple[str, str]]]:
-    """Level ("ok", "warn", "error"), message, and key/value pairs."""
+    """Level ("ok", "warn", "error"), message, and key/value pairs.
+
+    audio_level is the microphone stream: ok, warn (near silence), or error
+    (no frames, clipping, or the reSpeaker stalled).
+    """
     values = [
         ("input", input_name or ""),
         ("listening", str(listening).lower()),
         ("direction_calibrated", str(calibrated).lower()),
         ("bridge_reconnects", str(reconnects)),
+        ("audio", audio_level),
+        ("audio_message", audio_message),
+        ("audio_rms", f"{audio_rms:.4f}"),
+        ("audio_peak", f"{audio_peak:.4f}"),
     ]
     if failed:
         return "error", failed, values
+    if audio_level == "error":
+        return "error", audio_message, values
     if input_name is None:
         return "warn", "Starting.", values
     if not listening:
         return "warn", "Listening paused.", values
+    if audio_level == "warn":
+        return "warn", audio_message, values
     return "ok", "Listening.", values

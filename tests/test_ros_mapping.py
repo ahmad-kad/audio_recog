@@ -74,3 +74,20 @@ def test_diagnostic_levels():
     level, message, values = mapping.diagnostic("xiao", True, True, 0, "no mic")
     assert (level, message) == ("error", "no mic")
     assert ("bridge_reconnects", "0") in values
+    level, message, values = mapping.diagnostic(
+        "xiao",
+        True,
+        True,
+        0,
+        audio_level="error",
+        audio_message="Audio is clipping.",
+        audio_rms=0.2,
+        audio_peak=1.0,
+    )
+    assert (level, message) == ("error", "Audio is clipping.")
+    assert ("audio", "error") in values
+    assert ("audio_peak", "1.0000") in values
+    level, message, _ = mapping.diagnostic(
+        "xiao", True, True, 0, audio_level="warn", audio_message="Audio level is near silence."
+    )
+    assert (level, message) == ("warn", "Audio level is near silence.")

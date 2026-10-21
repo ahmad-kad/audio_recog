@@ -56,7 +56,7 @@ Published:
 | `reply` | `std_msgs/String` | reliable, depth 10 | the rover speaks |
 | `sound_direction` | `rover_voice_msgs/SoundDirection` | sensor data (best effort, depth 5) | about 16 Hz, reSpeaker only |
 | `events` | `std_msgs/String` | reliable, depth 50 | every event as JSON, the same as `--json` |
-| `/diagnostics` | `diagnostic_msgs/DiagnosticArray` | default | 1 Hz: input, listening, calibration, bridge reconnects |
+| `/diagnostics` | `diagnostic_msgs/DiagnosticArray` | default | 1 Hz: input, listening, calibration, bridge reconnects, audio level |
 
 `command` is volatile on purpose. A controller that starts late does not receive an old command. It can read `state`, which is latched.
 
@@ -114,6 +114,7 @@ The direction calibration file is `.doa_calibration.json` in the repo, or the pa
 
 - **Quitting.** "Goodbye" and the other quit phrases do not stop the node. They are handled as ordinary speech.
 - **Lost USB link.** If the XIAO's link drops, the node keeps running, reconnects, and reports the count in diagnostics.
+- **Bad audio.** `/diagnostics` goes to error when frames stop, the level clips, or the reSpeaker stalls, and to warn when the stream is near digital silence. The same sentences are printed on the terminal. Listening continues. `audio`, `audio_message`, `audio_rms`, and `audio_peak` are on the status.
 - **Crashes.** If the node exits, for example because the array is unplugged at start, launch restarts it after 5 s.
 - **Stopping.** Ctrl-C and SIGTERM close the microphone cleanly.
 - **Speech only.** Nothing here moves the rover. An emergency stop belongs in the controller or the hardware, not in speech recognition.

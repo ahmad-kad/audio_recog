@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 
 from rover_voice.audio.base import Microphone
+from rover_voice.audio.health import AudioMonitor
 from rover_voice.config import FRAME_MS, SAMPLE_RATE
 from rover_voice.errors import AudioDeviceError
 
@@ -43,6 +44,7 @@ class MicrophoneStream:
         self._queue: queue.Queue[np.ndarray] = queue.Queue()
         self._stream: Any = None  # sounddevice.InputStream
         self.directions = None  # a plain microphone cannot tell direction
+        self.health = AudioMonitor()
 
     def start(self, device: str | int | None = None) -> str:
         try:
@@ -77,9 +79,11 @@ class MicrophoneStream:
 
     def read(self, timeout: float = 0.5) -> np.ndarray | None:
         try:
-            return self._queue.get(timeout=timeout)
+            frame = self._queue.get(timeout=timeout)
         except queue.Empty:
-            return None
+            frame = None
+        self.health.observe(frame)
+        return frame
 
     def drain(self) -> None:
         """Drop audio captured while the rover was speaking."""
